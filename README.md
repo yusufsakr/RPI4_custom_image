@@ -87,7 +87,7 @@ ct-ng menuconfig
    * Allow Extending the toolchain after it is created ...
      > Paths and misc options -> Render the toolchain read-only = false
    *  Change the ARM Cortex core ...
-     > Target options -> Emit assembly for CPU: Change cortex-a53 to cortex-a72
+      > Target options -> Emit assembly for CPU: Change cortex-a53 to cortex-a72
    * Chane the tuple’s vendor string ...
      > Toolchain options -> Tuple’s vendor string: Change rpi3 torpi4
 
@@ -97,3 +97,5 @@ ct-ng build
 ```
 7) The toolchain will be named aarch64-rpi4-linux-gnu and created in ...
    > ${HOME}/x-tools/aarch64-rpi4-linux-gnu
+
+## Bootloader
