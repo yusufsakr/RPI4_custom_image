@@ -166,6 +166,7 @@ cd linux
 ### Config and Build the Kernel
 We just use the default config for the RPI4 model B, by the knowledge of its [Specs](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/specifications/).
 ```
+PATH=$PATH:~/x-tools/aarch64-rpi4-linux-gnu/bin
 make ARCH=arm64 CROSS_COMPILE=aarch64-rpi4-linux-gnu- bcm2711_defconfig
 make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-rpi4-linux-gnu-
 ```
