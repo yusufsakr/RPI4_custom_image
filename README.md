@@ -99,3 +99,57 @@ ct-ng build
    > ${HOME}/x-tools/aarch64-rpi4-linux-gnu
 
 ## Bootloader
+The bootloader’s job is to set up the system to a basic level and load the kernel.
+
+### Download u-boot source
+```
+cd ~
+git clone git://git.denx.de/u-boot.git
+cd u-boot
+git checkout v2021.10 -b v2021.10
+```
+
+### Configure U-Boot
+```
+export PATH=${HOME}/x-tools/aarch64-rpi4-linux-gnu/bin/:$PATH
+export CROSS_COMPILE=aarch64-rpi4-linux-gnu-
+make rpi_4_defconfig
+```
+
+### Build u-boot
+```
+make
+```
+### Install U-Boot
+1. We will copy the u-boot bary file to the "boot" partition of the SD Card we create earlier.
+It could be in another destination.
+```
+sudo cp u-boot.bin /mnt/boot
+```
+
+**NOTE:**
+Raspberry Pi has its own proprietary bootloader, which is loaded by the ROM code and is capable of loading the kernel. However, since I’d like to use the open source u-boot, I’ll need to configure the Raspberry Pi boot loader to load u-boot and then let u-boot load the kernel.
+
+2. Download Raspberry Pi firmware/boot directory
+```
+cd ~
+svn checkout https://github.com/raspberrypi/firmware/trunk/boot
+```
+
+3. Copy RPI4 bootloader into boot partition
+```
+sudo cp boot/{bootcode.bin,start4.elf} /mnt/boot/
+```
+
+4. Let RPI4 bootloader load U-Boot
+```
+cat << EOF > config.txt
+enable_uart=1
+arm_64bit=1
+kernel=u-boot.bin
+EOF
+
+sudo mv config.txt /mnt/boot/
+```
+
+## Kernel
