@@ -153,3 +153,188 @@ sudo mv config.txt /mnt/boot/
 ```
 
 ## Kernel
+Now we will compile the kernel Image.
+
+### Download the Kernel Source
+Despite that the original Linux kernel from [Linus Torvalds](https://github.com/torvalds/linux) should work. But, using the RPI's fork of it would be more stable.
+```
+cd ~
+git clone --depth=1 -b rpi-5.10.y https://github.com/raspberrypi/linux.git
+cd linux
+```
+
+### Config and Build the Kernel
+We just use the default config for the RPI4 model B, by the knowledge of its [Specs](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/specifications/).
+```
+make ARCH=arm64 CROSS_COMPILE=aarch64-rpi4-linux-gnu- bcm2711_defconfig
+make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-rpi4-linux-gnu-
+```
+
+### Install the kernel and device tree
+Now we copy the kernel image and device tree binary (*.dtb) into the boot partition on the SD card.
+```
+sudo cp arch/arm64/boot/Image /mnt/boot
+sudo cp arch/arm64/boot/dts/broadcom/bcm2711-rpi-4-b.dtb /mnt/boot/
+```
+
+## Root filesystem
+We will Customize the Root filesystem folders and files.
+
+### Create Directories
+```
+mkdir rootfs
+cd rootfs
+mkdir {bin,dev,etc,home,lib64,proc,sbin,sys,tmp,usr,var}
+mkdir usr/{bin,lib,sbin}
+mkdir var/log
+
+# Create a symbolink lib pointing to lib64
+ln -s lib64 lib
+
+tree -d
+# Output ...
+# .
+# ├── bin
+# ├── dev
+# ├── etc
+# ├── home
+# ├── lib -> lib64
+# ├── lib64
+# ├── proc
+# ├── sbin
+# ├── sys
+# ├── tmp
+# ├── usr
+# │   ├── bin
+# │   ├── lib
+# │   └── sbin
+# └── var
+#     └── log
+
+# 16 directories
+
+# Change the owner of the directories to be root
+# Because current user doesn't exist on target device
+sudo chown -R root:root *
+```
+
+### Build and Install Busybox
+We’ll use Busybox for essential Linux utilities such as shell. So, we need to install it to the rootfs directory just created.
+
+1) Download Source code
+```
+wget https://busybox.net/downloads/busybox-1.33.2.tar.bz2
+tar xf busybox-1.33.2.tar.bz2
+cd busybox-1.33.2/
+```
+2) Configuring
+```
+CROSS_COMPILE=${HOME}/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu-
+make CROSS_COMPILE="$CROSS_COMPILE" defconfig
+Change the install directory to be the one just created
+sed -i 's%^CONFIG_PREFIX=.*$%CONFIG_PREFIX="/home/hechaol/rootfs"%' .config
+```
+3) Building
+```
+make CROSS_COMPILE="$CROSS_COMPILE"
+```
+
+4) Installing
+```
+Use sudo because the directory is now owned by root
+sudo make CROSS_COMPILE="$CROSS_COMPILE" install
+```
+### Install required libraries
+* Next, we install some shared libraries required by Busybox. We can find those libraries by the following command ...
+```
+readelf -a ~/rootfs/bin/busybox | grep -E "(program interpreter)|(Shared library)"
+# Output ...
+#       [Requesting program interpreter: /lib/ld-linux-aarch64.so.1]
+#  0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+#  0x0000000000000001 (NEEDED)             Shared library: [libresolv.so.2]
+#  0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+```
+* Coping these files from the toolchain’s sysroot directory to the rootfs/lib directory ...
+```
+export SYSROOT=$(aarch64-rpi4-linux-gnu-gcc -print-sysroot)
+sudo cp -L ${SYSROOT}/lib64/{ld-linux-aarch64.so.1,libm.so.6,libresolv.so.2,libc.so.6} ~/rootfs/lib64/
+```
+
+### Create device nodes
+Two device nodes are needed by Busybox.
+```
+cd ~/rootfs
+sudo mknod -m 666 dev/null c 1 3
+sudo mknod -m 600 dev/console c 5 1
+```
+
+### Copy the rootfs contents to the SD Card rot partition
+```
+sudo cp ~/rootfs/ /mnt/root/
+```
+
+## Boot the Board
+Finally, with the Puzzle pieces are ready, we can boot the board using the U-Bootwe built earlier.
+
+### Configure U-Boot
+We need to configure the u-boot so that it can pass the correct kernel commandline and device tree binary to kernel. For simplicity, I’ll use the Busybox shell as the init program. 
+
+1) Creating txt file for the boot command ...
+   * Load the kernel image from partition 1 (boot partition) into memory.
+   * Load the initramfs from partition 1 (boot partition) into memory.
+   * Set kernel commandline.
+   * Boot using the given kernel, device tree binary and initramfs.
+```
+cd ~/u-boot/
+cat << EOF > boot_cmd.txt
+fatload mmc 0:1 \${kernel_addr_r} Image
+setenv bootargs "console=serial0,115200 console=tty1 root=/dev/mmcblk0p2 rw rootwait init=/bin/sh"
+booti \${kernel_addr_r} - \${fdt_addr}
+EOF
+```
+
+2) Generating the boot.scr file
+```
+~/u-boot/tools/mkimage -A arm64 -O linux -T script -C none -d boot_cmd.txt boot.scr
+```
+
+3) Copy the compiled boot script to boot partition
+```
+sudo cp boot.scr /mnt/boot/
+```
+
+### BOOTING IT :)
+At Last we can boot the Image on RPI4.
+
+1) Check on the boot partition files ...
+```
+tree /mnt/boot/
+# OUTPUT ...
+# /mnt/boot/
+# ├── bcm2711-rpi-4-b.dtb
+# ├── bootcode.bin
+# ├── boot.scr
+# ├── config.txt
+# ├── Image
+# ├── start4.elf
+# ├── uRamdisk
+# └── u-boot.bin
+
+# 0 directories, 7 files
+```
+2) Unmount the SD Card
+3) Plug the SD Card in the RPI4
+4) Connect it with a Monitor (I didn't try the UART connection with the image yet).
+5) Power it up
+6) Now you should see the Busybox Shell if the image have been created successfully.
+
+# Resources
+* [Creating the RPI4 Toolchain](https://ilyas-hamadouche.medium.com/creating-a-cross-platform-toolchain-for-raspberry-pi-4-5c626d908b9d)
+* [Hechao's Blog](https://hechao.li/2021/12/20/Boot-Raspberry-Pi-4-Using-uboot-and-Initramfs/)
+* [link](https://forums.raspberrypi.com/viewtopic.php?f=98&t=314845)
+* [Mastering Embedded Linux Programmin - Third Edition](https://www.amazon.com/Mastering-Embedded-Linux-Programming-potential/dp/1789530385)
+* [linux From Scratch](https://www.linuxfromscratch.org/)
+* [How Toolchan is Constructed](https://crosstool-ng.github.io/docs/toolchain-construction/)
+
+
+Best Wishes :)
