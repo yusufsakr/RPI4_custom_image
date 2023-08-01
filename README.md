@@ -232,7 +232,7 @@ cd busybox-1.33.2/
 ```
 CROSS_COMPILE=${HOME}/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu-
 make CROSS_COMPILE="$CROSS_COMPILE" defconfig
-Change the install directory to be the one just created
+# Change the install directory to be the one just created
 sed -i 's%^CONFIG_PREFIX=.*$%CONFIG_PREFIX="/home/hechaol/rootfs"%' .config
 ```
 3) Building
