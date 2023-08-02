@@ -166,6 +166,7 @@ cd linux
 ### Config and Build the Kernel
 We just use the default config for the RPI4 model B, by the knowledge of its [Specs](https://www.raspberrypi.com/products/raspberry-pi-4-model-b/specifications/).
 ```
+PATH=$PATH:~/x-tools/aarch64-rpi4-linux-gnu/bin
 make ARCH=arm64 CROSS_COMPILE=aarch64-rpi4-linux-gnu- bcm2711_defconfig
 make -j$(nproc) ARCH=arm64 CROSS_COMPILE=aarch64-rpi4-linux-gnu-
 ```
@@ -231,8 +232,8 @@ cd busybox-1.33.2/
 ```
 CROSS_COMPILE=${HOME}/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu-
 make CROSS_COMPILE="$CROSS_COMPILE" defconfig
-Change the install directory to be the one just created
-sed -i 's%^CONFIG_PREFIX=.*$%CONFIG_PREFIX="/home/hechaol/rootfs"%' .config
+# Change the install directory to be the one just created
+sed -i 's%^CONFIG_PREFIX=.*$%CONFIG_PREFIX="/home/yusuf/rootfs"%' .config
 ```
 3) Building
 ```
@@ -241,7 +242,7 @@ make CROSS_COMPILE="$CROSS_COMPILE"
 
 4) Installing
 ```
-Use sudo because the directory is now owned by root
+# Use sudo because the directory is now owned by root
 sudo make CROSS_COMPILE="$CROSS_COMPILE" install
 ```
 ### Install required libraries
@@ -270,7 +271,7 @@ sudo mknod -m 600 dev/console c 5 1
 
 ### Copy the rootfs contents to the SD Card rot partition
 ```
-sudo cp ~/rootfs/ /mnt/root/
+sudo cp -r ~/rootfs/* /mnt/root/
 ```
 
 ## Boot the Board
