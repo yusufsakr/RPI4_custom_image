@@ -271,7 +271,7 @@ sudo mknod -m 600 dev/console c 5 1
 
 ### Copy the rootfs contents to the SD Card rot partition
 ```
-sudo cp ~/rootfs/ /mnt/root/
+sudo cp -r ~/rootfs/* /mnt/root/
 ```
 
 ## Boot the Board
