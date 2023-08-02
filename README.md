@@ -89,7 +89,7 @@ ct-ng menuconfig
    *  Change the ARM Cortex core ...
       > Target options -> Emit assembly for CPU: Change cortex-a53 to cortex-a72
    * Chane the tuple’s vendor string ...
-     > Toolchain options -> Tuple’s vendor string: Change rpi3 torpi4
+     > Toolchain options -> Tuple’s vendor string: Change rpi3 to rpi4
 
 6) Build the Toolchain :
 ```
@@ -121,8 +121,8 @@ make rpi_4_defconfig
 make
 ```
 ### Install U-Boot
-1. We will copy the u-boot bary file to the "boot" partition of the SD Card we create earlier.
-It could be in another destination.
+1. We will copy the u-boot binary file to the "boot" partition of the SD Card we created earlier.
+**NOTE** The mount destination may be different, ex: /media/${USER}/boot/.
 ```
 sudo cp u-boot.bin /mnt/boot
 ```
@@ -232,6 +232,7 @@ cd busybox-1.33.2/
 ```
 CROSS_COMPILE=${HOME}/x-tools/aarch64-rpi4-linux-gnu/bin/aarch64-rpi4-linux-gnu-
 make CROSS_COMPILE="$CROSS_COMPILE" defconfig
+
 # Change the install directory to be the one just created
 sed -i 's%^CONFIG_PREFIX=.*$%CONFIG_PREFIX="/home/yusuf/rootfs"%' .config
 ```
@@ -269,7 +270,7 @@ sudo mknod -m 666 dev/null c 1 3
 sudo mknod -m 600 dev/console c 5 1
 ```
 
-### Copy the rootfs contents to the SD Card rot partition
+### Copy the rootfs contents to the SD Card root partition
 ```
 sudo cp -r ~/rootfs/* /mnt/root/
 ```
