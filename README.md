@@ -242,7 +242,7 @@ make CROSS_COMPILE="$CROSS_COMPILE"
 
 4) Installing
 ```
-Use sudo because the directory is now owned by root
+# Use sudo because the directory is now owned by root
 sudo make CROSS_COMPILE="$CROSS_COMPILE" install
 ```
 ### Install required libraries
