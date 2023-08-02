@@ -81,7 +81,7 @@ ct-ng aarch64-rpi3-linux-gnu
 ```
 ct-ng menuconfig
 ```
-<img src="https://github.com/yusufsakr/RPI4_build_root/assets/91801319/8b22e03e-f24b-4de5-bc3d-069019b0afed" width="500">
+<img src="https://github.com/yusufsakr/RPI4_build_root/assets/91801319/958c89fd-1790-4074-905b-7f901a26960f" width="500">
 
 5) We will make 3 changes :
    * Allow Extending the toolchain after it is created ...
