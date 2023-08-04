@@ -9,6 +9,7 @@ In this tutorial we will build and configure a minimal image for raspberry pi 4 
 2) Raspberry Pi 4
 3) SD Card >= 2gb
 4) SD Card Reader
+5)  USB to TTL (PL2303)
 
 ## Major Steps
 1) Configure the SD Card
@@ -326,9 +327,12 @@ tree /mnt/boot/
 ```
 2) Unmount the SD Card
 3) Plug the SD Card in the RPI4
-4) Connect it with a Monitor (I didn't try the UART connection with the image yet).
-5) Power it up
-6) Now you should see the Busybox Shell if the image have been created successfully.
+4) Connect RPI4 witg the usb TTL
+   * RX  -> TX
+   * TX  -> RX
+   * GND -> GND
+6) Power it up
+7) Now you should see the Busybox Shell if the image have been created successfully.
 
 # Resources
 * [Creating the RPI4 Toolchain](https://ilyas-hamadouche.medium.com/creating-a-cross-platform-toolchain-for-raspberry-pi-4-5c626d908b9d)
