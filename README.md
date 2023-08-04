@@ -37,7 +37,7 @@ In this tutorial we will build and configure a minimal image for raspberry pi 4 
 ## Install some dependecies
 ```
 sudo apt -y install gcc-arm-linux-gnueabihf binutils-arm-linux-gnueabihf
-sudo apt-get -y install bison flex bc libssl-dev make gcc automake chrpath g++ git gperf gawk help2man libexpat1-dev libncurses5-dev libsdl1.2-dev libtool libtool-bin libtool-doc python2.7-dev texinfo
+sudo apt-get -y install bison flex bc libssl-dev make gcc automake chrpath g++ git gperf gawk help2man libexpat1-dev libncurses5-dev libsdl1.2-dev libtool libtool-bin libtool-doc python2.7-dev texinfo minicom
 ```
      
 ## Toolchain
