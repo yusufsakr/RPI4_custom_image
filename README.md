@@ -333,7 +333,7 @@ tree /mnt/boot/
    * GND -> GND
 5) Connect the usb TTL to the Laptop
 6) In Terminal, Open minicom to read Serial from the RPI4 ...
-'''
+```
 cd /dev/
 
 # Search for the TTL Port
@@ -341,9 +341,9 @@ dmesg | grep pl2303
 
 # As default you will see it at ttyUSB0
 sudo minicom -D ttyUSB0
-'''
-8) Power the RPI4 up
-9) Now you should see the u-boot and the kernel loading till the console, if the image have been created successfully.
+```
+7) Power the RPI4 up
+8) Now you should see the u-boot and the kernel loading till the console, if the image have been created successfully.
 
 # Resources
 * [Creating the RPI4 Toolchain](https://ilyas-hamadouche.medium.com/creating-a-cross-platform-toolchain-for-raspberry-pi-4-5c626d908b9d)
