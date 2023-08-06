@@ -148,6 +148,7 @@ cat << EOF > config.txt
 enable_uart=1
 arm_64bit=1
 kernel=u-boot.bin
+gpu_mem=512
 EOF
 
 sudo mv config.txt /mnt/boot/
