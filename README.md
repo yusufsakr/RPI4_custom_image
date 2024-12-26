@@ -1,5 +1,5 @@
 # RPI4 Custom Image
-Embedded Linux Build Root for Raspberry Pi 4 Step-By-Step.
+Embedded Linux Customized Image for Raspberry Pi 4 Step-By-Step.
 
 ## Overview
 In this tutorial we will build and configure a minimal image for raspberry pi 4 with customized toolchain, uboot, kernel and root filesystem.
